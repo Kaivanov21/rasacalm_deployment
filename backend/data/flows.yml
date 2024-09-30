@@ -1,0 +1,110 @@
+flows:
+  welcome:
+    description: This flow after user greets chatbot introduces chatbot's functions to user and collect the task which user wants to be performed
+    
+    nlu_trigger:
+      - intent: welcome
+    steps:
+      - action: utter_user_greet
+      - id: "collect_user_task"
+        collect: user_task
+        description: Collect the task that user wants from chatbot
+        ask_before_filling: true
+        next:
+          - if: slots.user_task == "Πληροφορίες για τα μαθήματα"
+            then:
+              - call: get_course_info
+                next: END
+                                  
+          - if: slots.user_task == "Γενικές ερωτήσεις για σχολή"
+            then:
+              - call: get_knowledge_based_info
+                next: END
+          - else:
+              - action: utter_out_of_scope
+                next: END
+                 
+  
+  get_course_info:
+    description: This flow lets users get information about a specific course, only specific information such as course description, name of teacher who provides course, ects of course, and stream type of course, can be provided.
+    steps:
+      - id: "collect_course_name"
+        collect: course_name
+        description: Collect the course name from the user
+        
+      - action: action_check_course_name_exists
+        next:
+          - if: slots.course_name_exists
+            then:
+              - id: "collect_info_type"
+                collect: info_type
+                description: Collect the type of information the user wants to get about the course
+                ask_before_filling: true
+                next:
+                  - if: slots.info_type == "πληροφορία για καθηγητές"
+                    then:
+                      - action: utter_teacher_info
+                        next: END
+                  - if: slots.info_type == "περιγραφή μαθήματος"
+                    then:
+                      - action: action_retrieve_course_description
+                      - action: utter_course_description
+                        next: END
+                  - if: slots.info_type == "ects"
+                    then:
+                      - action: utter_ects
+                        next: END
+                  - if: slots.info_type == "εξάμηνο"
+                    then:
+                      - action: utter_semester
+                        next: END
+                  - if: slots.info_type == "elearning"
+                    then:
+                      - action: action_retrieve_elearning
+                      - action: utter_elearning
+                        next: END
+                  - else:
+                      - action: utter_invalid_info_type
+                        next: END
+          - else:
+              - action: utter_course_name_not_exists
+                next: END
+
+  get_knowledge_based_info:
+    description: This flow is triggered when the user wants to ask general information about Computer Science Department
+    steps:
+      # - action: utter_try_to_answer
+      - id: "collect_user_query"
+        collect: collect_user_query
+        description: Collect the user query
+        ask_before_filling: true
+      - action: action_trigger_search
+      - action: utter_can_do_something_else
+        next: END
+  
+  pattern_completed:
+    description: This flow is triggered when the user has completed the pattern
+    steps:
+      - action: utter_can_do_something_else
+  
+  
+  pattern_search:
+    description: handle a knowledge-based question or request and provide answer in Greek
+    name: pattern search
+    steps:
+      - action: action_trigger_search
+       
+
+    
+  
+
+
+# ask teacher info (ποιος κανει μαθ αναλυση και δωσε στοιχ επικ. του, στοιχ επικ. καθηγητη ταδε)
+# table courses, teachers,  eksamino, ects, streams, didaktiki eprkeia
+# table teacher-info
+# ask course info (ποιος κανει μαθ αναλυση και δωσε στοιχ επικ. του, ποσα ects, τι μαθηματα σε 6 εξαμηνο)
+# ask stream questions
+
+#search policy
+
+# out of scope - clarify is it out of scope - then call chatgpt api

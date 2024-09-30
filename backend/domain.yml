@@ -1,0 +1,149 @@
+version: "3.1"
+
+slots:
+  course_name:
+    type: text
+  course_code:
+    type: text
+  course_type:
+    type: text
+  course_name_exists:
+    type: bool
+  info_type:
+    type: categorical
+    values:
+      - "πληροφορία για καθηγητές"
+      - "περιγραφή μαθήματος"
+      - "ects"
+      - "ροή"
+      - "εξάμηνο"
+      - "elearning"
+    mappings:
+      - type: custom
+  course_teacher_info:
+    type: text
+  course_description:
+    type: text
+  course_ects:
+    type: text
+  course_semester:
+    type: text
+  course_elearning:
+    type: text
+  ask_another_info_type:
+    type: categorical
+    values:
+      - "Ναι"
+      - "Όχι"
+  user_task:
+    type: text
+  collect_user_query:
+    type: text
+  user_confirmation:
+    type: bool
+  ask_before_filling:
+    type: bool
+
+intents:
+  - welcome
+
+actions:
+ 
+  - utter_ask_course_name
+  - action_check_course_name_exists
+  - utter_teacher_info
+  - utter_course_name_not_exists
+  - utter_ask_info_type
+  - utter_invalid_info_type
+  - action_retrieve_course_description
+  - action_retrieve_ects
+  - action_retrieve_semester
+  - action_retrieve_elearning
+  - utter_course_description
+  - utter_ects
+  - utter_semester
+  - utter_elearning
+  - utter_can_do_something_else
+  - utter_corrected_previous_input
+  - utter_ask_another_info_type
+  - utter_ask_user_task
+  - utter_out_of_scope
+  - utter_ask_collect_user_query
+  - utter_user_greet
+  - utter_ask_user_confirmation
+  - utter_flow_continue_interrupted
+
+responses:
+  utter_ask_course_name:
+    - text: "Για ποιό μάθημα θέλετε να πάρετε πληροφορίες;"
+  utter_teacher_info:
+    - text: "Ο καθηγητής του μαθήματος: {course_name}, είναι {course_teacher_info}."
+  utter_course_name_not_exists:
+    - text: "Δεν υπάρχουν πληροφορίες για αυτό το μάθημα."
+  utter_ask_info_type:
+    - text: "Τι πληροφορίες θέλετε για το μάθημα {course_name};"
+      buttons:
+      - title: "πληροφορία για καθηγητές"
+        payload: 'πληροφορία για καθηγητές'
+      - title: "περιγραφή μαθήματος"
+        payload: 'περιγραφή μαθήματος'
+      - title: "ects"
+        payload: 'ects'
+      - title: "εξάμηνο"
+        payload: 'εξάμηνο'
+      - title: "elearning"
+        payload: 'elearning'
+  utter_invalid_info_type:
+    - text: "Δεν μπορώ να προσφέρω τέτοια πληροφορία για το μάθημα."
+  utter_course_description:
+    - text: "Το μάθημα {course_name} έχει εξής περιγραφή: {course_description}."
+      metadata:
+        rephrase: True
+  utter_ects:
+    - text: "Το μάθημα {course_name} έχει {course_ects} ECTS."
+  utter_semester:
+    - text: "Το μάθημα {course_name} διδάσκεται στο {course_semester} εξάμηνο."
+  utter_elearning:
+    - text: "Μπορείτε να βρείτε περισσότερες πληροφορίες για το μάθημα {course_name} στο elearning: {course_elearning}."    
+  utter_can_do_something_else:
+    - text: "Υπάρχει κάτι άλλο που μπορώ να σας βοηθήσω;"
+  utter_ask_another_info_type:
+    - text: "Θέλετε κάποια άλλη πληροφορία για το μάθημα {course_name};"
+      buttons:
+      - title: "Ναι"
+        payload: 'Ναι'
+      - title: "Όχι"
+        payload: 'Όχι'
+  utter_corrected_previous_input:
+    - text: "Καλά, ενημερώνω το {{ context.corrected_slots.keys()|join(', ') }} σε {{ context.corrected_slots.values()|join(', ') }} αντίστοιχα."
+      metadata:
+        rephrase: True
+        template: jinja
+  utter_ask_user_task:
+  - text: Είμαι ο SecretaryChatbot, ο βοηθός σας για το Τμήμα Πληροφορικής του ΑΠΘ. Είμαι εδώ για να σας βοηθήσω με οποιαδήποτε ερώτηση ή πληροφορία που χρειάζεστε.
+    buttons:
+      - title: Πληροφορίες για τα μαθήματα
+        payload: 'Πληροφορίες για τα μαθήματα'
+      - title: Γενικές ερωτήσεις για σχολή
+        payload: 'Γενικές ερωτήσεις για σχολή'
+
+  utter_try_to_answer:
+  - text: Θα προσπαθήσω να απαντήσω στην ερώτηση σας σχετικά με το Τμήμα Πληροφορικής.
+
+  utter_ask_collect_user_query:
+  - text: Θα προσπαθήσω να απαντήσω στην ερώτηση σας σχετικά με το Τμήμα Πληροφορικής.
+
+  utter_out_of_scope:
+  - text: Η ερώτηση σας δεν σχετίζεται με το Τμήμα ΠΛηροφορικής.
+  utter_user_greet:
+  - text: Γεια σας !
+  utter_ask_user_confirmation:
+    - text: "Θέλετε να κάνετε: {collect_user_query};"
+      buttons:
+      - title: "Ναι"
+        payload: 'Ναι'
+      - title: "Όχι"
+        payload: 'Όχι'
+  utter_flow_continue_interrupted:
+    - text: ""
+      
